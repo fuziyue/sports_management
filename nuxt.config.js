@@ -40,7 +40,24 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios'
   ],
+  /*配置跨域代理*/
+  // axios: {
+  //   //baseURL:"api.dangyunlong.com", //设置统一的基础url，线上环境关闭代理时使用它。
+  //   proxy: true, // 表示开启代理
+  //   prefix: '/api', // 表示给请求url加个前缀 /api
+  //   credentials: true // 表示跨域请求时是否需要使用凭证
+  // },
+  // proxy: {
+  //     '/api': {
+  //       target: 'http://localhost:3002/', // 目标接口域名
+  //       pathRewrite: {
+  //         '^/api': '/', // 把 /api 替换成 /
+  //         changeOrigin: true // 表示是否跨域
+  //       },
+  //     }
+  // },
   /*
   ** Build configuration
   */
@@ -50,6 +67,15 @@ export default {
     ** You can extend webpack config here
     */
     extend (config, ctx) {
+    },
+    /*加上axios，防止二次打包*/
+    vendor: ['element-ui','axios'],
+    postcss: {
+      preset: {
+        features: {
+          customProperties: false
+        }
+      }
     }
   }
 }
