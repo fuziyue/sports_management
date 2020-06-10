@@ -29,7 +29,8 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/element-ui'
+    '@/plugins/element-ui',
+
   ],
   /*
   ** Nuxt.js dev-modules
@@ -40,7 +41,8 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    ['cookie-universal-nuxt', { alias: 'cookiz' }],
   ],
   /*配置跨域代理*/
   // axios: {

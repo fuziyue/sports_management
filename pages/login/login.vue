@@ -2,7 +2,7 @@
   <div>
 
     <el-container>
-      <el-header class="bg">XXX管理系统</el-header>
+      <el-header class="bg">体育赛事管理系统</el-header>
 
       <el-main class="head">
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -23,7 +23,8 @@
 </template>
 
 <script>
-// import axios from 'axios';
+// 引入cookie，process.client为客户端，即在客户端才执行
+const Cookie = process.client ? require('js-cookie') : undefined;
 
 export default {
   // 这里引入context是上下文参数，代替了this，
@@ -88,29 +89,40 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           let obj = this.ruleForm;
-          console.log(obj.username, obj.pass)
-          console.log(this.ruleForm.username, this.ruleForm.pass)
           this.getLogin(obj);
-          // alert('submit!');
         } else {
-          console.log('error submit!!');
+          console.log('账号或密码错误!');
           return false;
         }
       });
     },
     getLogin(obj) {
       return this.$axios.get(`/json/testLogin.json`, {
-        params:{
-          email: obj.username,
-          password: obj.pass
-        }
-      })
+          params:{
+            email: obj.username,
+            password: obj.pass
+          }
+        })
         .then(res => {
-        //获取到内容
-        console.log(res.data);
-        //赋值
-        return {txt:res.data};
-       })
+          //获取到内容
+          console.log(res.data);
+
+          let success = res.data.success;
+          if (success) {
+            this.$message({
+              message: '登录成功',
+              type: 'success'
+            });
+
+            // window.sessionStorage.setItem('token', res.data.token);
+            let token = Cookie.set('token', res.data.token);
+            // console.log(token,'token')
+            this.$store.commit('setToken', token);
+            this.$router.push('/home/home');
+          } else{
+            this.$message.error('登录失败');
+          }
+        })
     },
   }
 }
