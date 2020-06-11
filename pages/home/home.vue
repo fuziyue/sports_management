@@ -42,15 +42,16 @@
             </template>
             <el-menu-item-group>
               <span slot="title">发布</span>
-              <el-menu-item index="1-1" @click="click_index(1)">比赛信息</el-menu-item>
+              <el-menu-item index="1-1" @click="click_index(1)">赛事发布</el-menu-item>
+              <el-menu-item index="1-2" @click="click_index(2)">赛事信息</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="数据导入">
-              <el-menu-item index="1-2" @click="click_index(2)">比赛安排</el-menu-item>
-              <el-menu-item index="1-3" @click="click_index(3)">学校、成绩换算</el-menu-item>
-              <el-menu-item index="1-4" @click="click_index(4)">成绩信息</el-menu-item>
+              <el-menu-item index="1-3" @click="click_index(3)">比赛安排</el-menu-item>
+              <el-menu-item index="1-4" @click="click_index(4)">学校、成绩换算</el-menu-item>
+              <el-menu-item index="1-5" @click="click_index(5)">成绩信息</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="数据导出">
-              <el-menu-item index="1-5" @click="click_index(5)">会员报名</el-menu-item>
+              <el-menu-item index="1-6" @click="click_index(6)">会员报名</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
         </el-menu>
@@ -59,52 +60,110 @@
       <el-container>
         <el-main>
           <div v-if="index===1">
-            <h2 class="release-h2">发布比赛信息</h2>
-            <table border="1">
+            <h2 class="release-h2">赛事发布</h2>
+            <table class="table-box" border="0" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>
                   <th>赛事名称</th>
-                  <th>时间</th>
+                  <th>比赛时间</th>
+                  <th>比赛地点</th>
                   <th>赛事内容</th>
+                  <th>操作</th>
                 </tr>
               </thead>
-              
+
               <tbody>
                 <tr>
-                  <td>100米</td>
-                  <td>2020-01-01</td>
-                  <td>100米内容</td>
-                </tr>
-                <tr>
-                  <td>200米</td>
-                  <td>2020-01-02</td>
-                  <td>200米内容</td>
+                  <td>
+                    <el-input
+                      type="text"
+                      placeholder="请输入内容"
+                      v-model="text"
+                      maxlength="50"
+                      show-word-limit
+                    >
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-date-picker
+                      v-model="value1"
+                      type="datetime"
+                      format="yyyy-MM-dd HH:mm"
+                      value-format="timestamp"
+                      placeholder="选择日期">
+                    </el-date-picker>
+                  </td>
+                  <td>
+                    <el-input
+                      type="text"
+                      placeholder="请输入内容"
+                      v-model="text2"
+                      maxlength="50"
+                      show-word-limit
+                    >
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-input
+                      type="textarea"
+                      placeholder="请输入内容"
+                      v-model="textarea"
+                      maxlength="1000"
+                      show-word-limit
+                      id="content"
+                    >
+                    </el-input>
+                  </td>
+                  <td><el-button type="primary" round @click="click_release">点击发布</el-button></td>
                 </tr>
               </tbody>
             </table>
-            <!-- <el-table
-              :data="tableData1"
-              border
+          </div>
+          <div v-if="index===2">
+            <h2 class="release-h2">赛事信息</h2>
+            <el-table
+              :data="sports_list.filter(date => !search || date.time.toLowerCase().includes(search.toLowerCase()) || date.name.toLowerCase().includes(search.toLowerCase()) || date.site.toLowerCase().includes(search.toLowerCase()) || date.content.toLowerCase().includes(search.toLowerCase()))"
               style="width: 100%">
               <el-table-column
-                prop="name"
-                label="赛事名称"
-                width="180">
+                label="时间"
+                prop="time">
               </el-table-column>
               <el-table-column
-                prop="time"
-                label="时间">
+                label="姓名"
+                prop="name">
               </el-table-column>
               <el-table-column
-                prop="content"
-                label="赛事内容">
+                label="比赛地点"
+                prop="site">
               </el-table-column>
-            </el-table> -->
+              <el-table-column
+                label="比赛内容"
+                prop="content">
+              </el-table-column>
+              <el-table-column
+                align="right">
+                <template slot="header" slot-scope="scope">
+                  <el-input
+                    v-model="search"
+                    size="mini"
+                    placeholder="输入关键字搜索"/>
+                </template>
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
           </div>
-          <div v-if="index===2">比赛安排内容</div>
-          <div v-if="index===3">学校成绩换算内容</div>
-          <div v-if="index===4">成绩内容</div>
-          <div v-if="index===5">
+          <div v-if="index===3">比赛安排内容</div>
+          <div v-if="index===4">学校成绩换算内容</div>
+          <div v-if="index===5">成绩内容</div>
+          <div v-if="index===6">
             <h2 class="release-h2">会员报名信息</h2>
             <el-table
               :data="tableData"
@@ -145,7 +204,7 @@
               :page-size="10"
               :hide-on-single-page="value"
               layout="prev, pager, next, jumper"
-              :total="100">
+              :total="total">
             </el-pagination>
           </div>
         </el-footer>
@@ -192,8 +251,8 @@ export default {
       },
       changePassIsOff: false,
 
-      isCollapse: true,
-      index: 1,
+      isCollapse: false,
+      index: 2,
 
       //会员报名信息
       tableData: [{
@@ -210,12 +269,37 @@ export default {
         identityCard: '4400XXX22'
       }],
 
-      currentPage3: 5,
+      //赛事信息
+      sports_list: [],
+      // tableData2: [{
+      //   time: '2020-01-03 18:20:30',
+      //   name: '女子高一组100米预赛第一组'
+      // }, {
+      //   time: '2020-02-02 18:20:30',
+      //   name: '男子高一组200米预赛第一组'
+      // }],
+      search: '',
+
+      currentPage3: 1,
       value: false,
+      text: '',
+      text2: '',
+      textarea: '',
+      value1: 0,
+
+      page: '1',
+      total: 0,
 
     };
   },
   methods: {
+    handleEdit(index, row) {
+      console.log(index, row, "点击编辑按钮");
+    },
+    handleDelete(index, row) {
+      console.log(index, row, "点击删除按钮");
+      this.click_delete(row.name, row.time, row.site);
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },
@@ -231,6 +315,11 @@ export default {
     click_index(index){
       console.log("index",index)
       this.index = index;
+
+      if(index === 2){  //点击的是：赛事信息
+        console.log('点击的是：赛事信息')
+        this.click_eventInfo(this.page);
+      }
     },
     openChangePassword(){
       this.changePassIsOff = !this.changePassIsOff;
@@ -247,6 +336,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          //修改密码API：http://127.0.0.1:5000/api/v1/changePassword
           return this.$axios.get(`/json/testChangePassword.json`, {
               params:{
                 token: Cookie.get('token'),
@@ -275,6 +365,76 @@ export default {
         }
       });
     },
+    click_release(){
+      if(this.text === '' || this.value1 === 0 || this.text2 === '' || this.textarea === ''){
+        return this.$message.error('请补充发布必填内容');
+      }else{
+        //赛事发布API：http://127.0.0.1:5000/api/v1/public
+        return this.$axios.post(`/json/testPublic.json`, {
+          params:{
+            token: Cookie.get('token'),
+            name: this.text,
+            time: this.value1,
+            content: this.textarea,
+            site: this.text2
+          }
+        })
+        .then(res => {
+          //获取到内容
+          console.log(res.data);
+
+          let status = res.data.status;
+          if (status === 'successful') {
+            this.$message({
+              message: '发布成功，请到赛事信息进行查看',
+              type: 'success'
+            });
+
+          } else{
+            this.$message.error('发布失败，请重新发布');
+          }
+        })
+      }
+    },
+    click_eventInfo(page){
+      //赛事查询API：http://127.0.0.1:5000/api/v1/sportsQuery
+      return this.$axios.get(`/json/testSportsQuery.json`, {
+        params:{
+          token: Cookie.get('token'),
+          page
+        }
+      })
+      .then(res => {
+        //获取到内容
+        console.log(res.data);
+        this.sports_list = res.data.sports_list;
+      })
+    },
+    click_delete(name, time, site){
+      //赛事删除API：http://127.0.0.1:5000/api/v1/public
+      return this.$axios.get(`/json/testPublic.json`, {
+        params:{
+          token: Cookie.get('token'),
+          name,
+          time,
+          site
+        }
+      })
+      .then(res => {
+        //获取到内容
+        console.log(res.data);
+
+        if (res.data.status === 'successful') {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          });
+
+        } else{
+          this.$message.error('删除失败');
+        }
+      })
+    }
   }
 }
 </script>
@@ -348,7 +508,9 @@ body > .el-container {
   position: fixed;
   left: 40%;
   top: 30%;
+  z-index: 100;
   border: 1px solid #EBEEF5;
+  background-color: #FFFFFF;
   border-radius: 10px;
   padding-right: 40px;
 }
@@ -381,4 +543,20 @@ body > .el-container {
 .btn{
   width: 100%;
 }
+
+.table-box{
+  border: 1px solid #EBEEF5;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.table-box th, .table-box td{
+  border: 1px solid #EBEEF5;
+  box-sizing: border-box;
+}
+
+.table-box td{
+  padding: 10px;
+}
+
 </style>

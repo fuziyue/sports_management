@@ -97,6 +97,7 @@ export default {
       });
     },
     getLogin(obj) {
+      //登录接口API：http://127.0.0.1:5000/api/v1/login
       return this.$axios.get(`/json/testLogin.json`, {
           params:{
             email: obj.username,
