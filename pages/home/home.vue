@@ -23,7 +23,49 @@
           <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button class="btn" type="primary" @click="submitForm('ruleForm')">确定</el-button>
+          <el-button class="btn" type="primary" @click="submitForm('ruleForm', 1)">确定</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <!-- 赛事信息编辑弹窗 -->
+    <div class="changePassword-form" v-if="changeInfoIsOff">
+      <h3 class="changePassword-h3 cf">
+        <p>赛事信息编辑</p>
+        <i class="el-icon-close" @click="closeChangePassword"></i>
+      </h3>
+      <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="比赛时间" required>
+          <el-col :span="11">
+            <el-form-item prop="date1">
+              <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm2.time1" style="width: 100%;"></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" :span="1">-</el-col>
+          <el-col :span="11">
+            <el-form-item prop="date2">
+              <el-time-picker value-format="HH:mm" placeholder="选择时间" v-model="ruleForm2.time2" style="width: 100%;"></el-time-picker>
+            </el-form-item>
+          </el-col>
+          <!-- <el-input type="date" v-model="ruleForm2.time"></el-input> -->
+        </el-form-item>
+        <el-form-item label="赛事地点" prop="site">
+          <el-input type="text" v-model="ruleForm2.site"></el-input>
+        </el-form-item>
+        <el-form-item label="赛事名称" prop="name">
+          <el-input type="text" v-model="ruleForm2.name"></el-input>
+        </el-form-item>
+        <el-form-item label="新赛事时间" prop="newTime">
+          <el-input type="text" v-model="ruleForm2.newTime"></el-input>
+        </el-form-item>
+        <el-form-item label="新赛事名称" prop="newName">
+          <el-input type="text" v-model="ruleForm2.newName"></el-input>
+        </el-form-item>
+        <el-form-item label="新赛事地点" prop="newSite">
+          <el-input type="text" v-model="ruleForm2.newSite"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="btn" type="primary" @click="submitForm('ruleForm2', 2)">确定</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -34,7 +76,7 @@
           <el-radio-button :label="false">展开</el-radio-button>
           <el-radio-button :label="true">收起</el-radio-button>
         </el-radio-group>
-        <el-menu default-active="1-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+        <el-menu default-active="1-2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-menu"></i>
@@ -57,23 +99,15 @@
         </el-menu>
       </el-aside>
 
+      <!-- 赛事管理内容 -->
       <el-container>
         <el-main>
           <div v-if="index===1">
             <h2 class="release-h2">赛事发布</h2>
             <table class="table-box" border="0" cellspacing="0" cellpadding="0">
-              <thead>
-                <tr>
-                  <th>赛事名称</th>
-                  <th>比赛时间</th>
-                  <th>比赛地点</th>
-                  <th>赛事内容</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-
               <tbody>
                 <tr>
+                  <td>赛事名称</td>
                   <td>
                     <el-input
                       type="text"
@@ -84,6 +118,9 @@
                     >
                     </el-input>
                   </td>
+                </tr>
+                <tr>
+                  <td>比赛时间</td>
                   <td>
                     <el-date-picker
                       v-model="value1"
@@ -93,6 +130,9 @@
                       placeholder="选择日期">
                     </el-date-picker>
                   </td>
+                </tr>
+                <tr>
+                  <td>比赛地点</td>
                   <td>
                     <el-input
                       type="text"
@@ -103,6 +143,9 @@
                     >
                     </el-input>
                   </td>
+                </tr>
+                <tr>
+                  <td>赛事内容</td>
                   <td>
                     <el-input
                       type="textarea"
@@ -114,6 +157,9 @@
                     >
                     </el-input>
                   </td>
+                </tr>
+                <tr>
+                  <td>操作</td>
                   <td><el-button type="primary" round @click="click_release">点击发布</el-button></td>
                 </tr>
               </tbody>
@@ -237,19 +283,55 @@ export default {
       }
     };
     return {
+      //修改密码
       ruleForm: {
         pass: '',
         checkPass: ''
       },
       rules: {
         pass: [
-          { validator: validatePass, trigger: 'blur' }
+          { required: true, validator: validatePass, trigger: 'blur' }
         ],
         checkPass: [
-          { validator: validatePass2, trigger: 'blur' }
+          { required: true, validator: validatePass2, trigger: 'blur' }
         ]
       },
       changePassIsOff: false,
+      //赛事信息编辑
+      ruleForm2: {
+        time1: '',
+        time2: '',
+        site: '',
+        name: '',
+        newTime: '',
+        newName: '',
+        newSite: ''
+      },
+      rules2: {
+        time1: [
+          { required: true, type: 'date', message: '请选择比赛时间', trigger: 'blur' },
+          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        time2: [
+          { required: true, type: 'date', message: '请选择比赛时间', trigger: 'blur' },
+        ],
+        site: [
+          { required: true, message: '请输入赛事地点', trigger: 'change' }
+        ],
+        name: [
+          { required: true, message: '请输入赛事名称', trigger: 'change' }
+        ],
+        newTime: [
+          { message: '请选择新赛事时间', trigger: 'change' }
+        ],
+        newName: [
+          { message: '请输入新赛事名称', trigger: 'change' }
+        ],
+        newSite: [
+          { message: '请输入新赛事地点', trigger: 'change' }
+        ]
+      },
+      changeInfoIsOff: true,
 
       isCollapse: false,
       index: 2,
@@ -271,13 +353,6 @@ export default {
 
       //赛事信息
       sports_list: [],
-      // tableData2: [{
-      //   time: '2020-01-03 18:20:30',
-      //   name: '女子高一组100米预赛第一组'
-      // }, {
-      //   time: '2020-02-02 18:20:30',
-      //   name: '男子高一组200米预赛第一组'
-      // }],
       search: '',
 
       currentPage3: 1,
@@ -333,16 +408,17 @@ export default {
       Cookie.remove('token');
       this.$router.push('/login/login');
     },
-    submitForm(formName) {
+    submitForm(formName, type) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          //修改密码API：http://127.0.0.1:5000/api/v1/changePassword
-          return this.$axios.get(`/json/testChangePassword.json`, {
-              params:{
-                token: Cookie.get('token'),
-                password: this.ruleForm.pass,
-                newPassword: this.ruleForm.checkPass
-              }
+          if (type === 1) {
+            //修改密码API：http://127.0.0.1:5000/api/v1/changePassword
+            return this.$axios.get(`/json/testChangePassword.json`, {
+                params:{
+                  token: Cookie.get('token'),
+                  password: this.ruleForm.pass,
+                  newPassword: this.ruleForm.checkPass
+                }
             })
             .then(res => {
               //获取到内容
@@ -359,11 +435,39 @@ export default {
                 this.$message.error('修改密码失败');
               }
             })
+          } else if(type === 2) {
+            console.log('这里是编辑内容')
+            console.log('time1', this.ruleForm2.time1)
+            console.log('time2', this.ruleForm2.time2)
+            //赛事修改API：http://127.0.0.1:5000/api/v1/public，PUT
+            return this.$axios.get(`/json/testChange.json`, {
+                params:{
+                  token: Cookie.get('token'),
+                  time: this.ruleForm2.time1,
+                  site: this.ruleForm2.site,
+                  name: this.ruleForm2.name,
+                  new_time: this.ruleForm2.new_time,
+                  new_name: this.ruleForm2.new_name,
+                  new_site: this.ruleForm2.new_site
+                }
+            })
+            .then(res => {
+              //获取到内容
+              console.log(res.data);
+
+              let status = res.data.status;
+
+            })
+          }
         } else {
+          this.$message.error('请输入必填项');
           console.log('error submit!!');
           return false;
         }
       });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     click_release(){
       if(this.text === '' || this.value1 === 0 || this.text2 === '' || this.textarea === ''){
@@ -389,7 +493,6 @@ export default {
               message: '发布成功，请到赛事信息进行查看',
               type: 'success'
             });
-
           } else{
             this.$message.error('发布失败，请重新发布');
           }
@@ -408,10 +511,11 @@ export default {
         //获取到内容
         console.log(res.data);
         this.sports_list = res.data.sports_list;
+        this.total = this.sports_list.length;
       })
     },
     click_delete(name, time, site){
-      //赛事删除API：http://127.0.0.1:5000/api/v1/public
+      //赛事删除API：http://127.0.0.1:5000/api/v1/public, delete
       return this.$axios.get(`/json/testPublic.json`, {
         params:{
           token: Cookie.get('token'),
@@ -559,4 +663,7 @@ body > .el-container {
   padding: 10px;
 }
 
+.line{
+  padding-left: 6px;
+}
 </style>
